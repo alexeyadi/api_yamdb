@@ -21,7 +21,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     'rest_framework',
     'api',
     'reviews',
@@ -109,3 +108,6 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 REST_FRAMEWORK = {}
 
 SIMPLE_JWT = {}
+
+AUTH_USER_MODEL = 'reviews.User' 
+

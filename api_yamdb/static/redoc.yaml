@@ -573,7 +573,7 @@ paths:
     get:
       tags:
         - REVIEWS
-      operationId: Полуение отзыва по id
+      operationId: Получение отзыва по id
       description: |
         Получить отзыв по id для указанного произведения.
 

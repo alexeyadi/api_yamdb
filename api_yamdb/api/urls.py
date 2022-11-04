@@ -9,7 +9,8 @@ from rest_framework_simplejwt.views import (
 
 from api.views import (
     CommentViewSet,
-    ReviewViewSet, UserViewSet
+    ReviewViewSet,
+    UserViewSet
 )
 
 
@@ -18,12 +19,12 @@ app_name = 'api'
 v1_router = DefaultRouter()
 v1_router.register(r'users', UserViewSet)
 v1_router.register(r'titles/(?P<title_id>\d+)/reviews',
-                ReviewViewSet, basename=r'reviews'
-                )
-v1_router.register(r'titles/(?P<title_id>\d+)/(?P<review_id>\d+)/',
-                CommentViewSet, basename=r'comments'
-                )
-
+                   ReviewViewSet,
+                   basename=r'reviews'
+                   )
+v1_router.register(r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
+                   CommentViewSet, basename=r'comments'
+                   )
 
 
 urlpatterns = [

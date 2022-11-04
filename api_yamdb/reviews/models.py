@@ -2,14 +2,18 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from .validators import validation_year
 
-CHOICES = ('user', 'moderator', 'admin', )
+CHOICES = [
+    ('user', 'user'),
+    ('moderator', 'moderator'),
+    ('admin', 'admin'),
+    ]
 
 
 class User(AbstractUser):
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True, )
-    first_name = models.CharField(max_length=150, )
-    last_name = models.CharField(max_length=150, )
+    first_name = models.CharField(max_length=150, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
     role = models.CharField(choices=CHOICES, default='user', max_length=50)
     bio = models.TextField('Биография', blank=True,)
 

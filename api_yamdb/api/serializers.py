@@ -1,6 +1,13 @@
 from rest_framework.serializers import ModelSerializer, SlugRelatedField
 from rest_framework.validators import UniqueTogetherValidator
-from reviews.models import Review, Comment
+from reviews.models import Comment, Review, User
+
+
+class UserSerializer(ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'first_name', 'last_name', 'role', 'bio', )
 
 
 class ReviewSerializer(ModelSerializer):

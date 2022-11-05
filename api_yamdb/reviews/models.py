@@ -1,24 +1,52 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-CHOICES = [
-    ('user', 'user'),
-    ('moderator', 'moderator'),
-    ('admin', 'admin'),
-    ]
-
 
 class User(AbstractUser):
-    username = models.CharField(max_length=150, unique=True)
-    email = models.EmailField(unique=True, )
-    first_name = models.CharField(max_length=150, blank=True)
-    last_name = models.CharField(max_length=150, blank=True)
-    role = models.CharField(choices=CHOICES, default='user', max_length=50)
-    bio = models.TextField('Биография', blank=True,)
+    USER = 'user'
+    MODER = 'moderator'
+    ADMIN = 'admin'
+    ROLES = [
+        (USER, 'user'),
+        (MODER, 'moderator'),
+        (ADMIN, 'admin'),
+    ]
+    username = models.CharField(
+        verbose_name='Логин',
+        max_length=150,
+        unique=True)
+    email = models.EmailField(
+        verbose_name='Почта',
+        unique=True, )
+    first_name = models.CharField(
+        verbose_name='Имя',
+        max_length=150,
+        blank=True)
+    last_name = models.CharField(
+        verbose_name='Фамилия',
+        max_length=150,
+        blank=True)
+    role = models.CharField(
+        verbose_name='Права доступа',
+        choices=ROLES,
+        default='user',
+        max_length=50)
+    bio = models.TextField(
+        verbose_name='Биография',
+        blank=True,)
 
-class Meta:
-    verbose_name = 'Пользователь'
-    verbose_name_plural = 'Пользователи'
+    @property
+    def is_moderator(self):
+        return self.role == self.MODER
+
+    @property
+    def is_admin(self):
+        return self.role == self.ADMIN
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+
 
 def __str__(self):
     return self.username

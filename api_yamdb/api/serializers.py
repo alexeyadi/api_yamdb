@@ -1,4 +1,5 @@
-from rest_framework.serializers import ModelSerializer, SlugRelatedField
+
+from rest_framework.serializers import ModelSerializer, SlugRelatedField, ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 from reviews.models import Comment, Review, User
 
@@ -8,6 +9,11 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name', 'last_name', 'role', 'bio', )
+
+    def validate_username(self, username):
+        if username == 'me':
+            raise ValidationError('Нельзя использовать имя "me"!')
+        return username
 
 
 class ReviewSerializer(ModelSerializer):

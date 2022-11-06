@@ -5,14 +5,15 @@ from rest_framework import mixins, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.viewsets import ModelViewSet
-from reviews.models import Category, Genre, Review, Title, User
 
-from .filters import TitleFilter
+from api.filters import TitleFilter
+from reviews.models import Category, Genre, Review, Title, User
 from .permissions import (IsAdminModeratorAuthorPermission,
                           IsAdminUserPermission)
 from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer, ReviewSerializer, TitleSerializer,
-                          UserSerializer)
+                          GenreSerializer, ReviewSerializer,
+                          TitleSerializer, UserSerializer)
+
 
 
 class UserViewSet(ModelViewSet):
@@ -25,6 +26,7 @@ class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
                    mixins.DestroyModelMixin, viewsets.GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    pagination_class = LimitOffsetPagination
     permission_classes = (IsAdminUserPermission,)
     filter_backends = (SearchFilter,)
     search_fields = ('name', )
@@ -34,16 +36,16 @@ class CategoryViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
                       mixins.DestroyModelMixin, viewsets.GenericViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    pagination_class = LimitOffsetPagination
     permission_classes = (IsAdminUserPermission,)
     filter_backends = (SearchFilter,)
     search_fields = ('name', )
 
 
 class TitleViewSet(ModelViewSet):
-    queryset = Title.objects.annotate(
-        rating=Avg('reviews__score')
-    ).all()
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitleSerializer
+    pagination_class = LimitOffsetPagination
     permission_classes = (IsAdminUserPermission,)
     filter_backends = (DjangoFilterBackend, )
     filterset_class = TitleFilter

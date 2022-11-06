@@ -55,6 +55,7 @@ class User(AbstractUser):
 
 
 class Genre(models.Model):
+    """Жанры произведений"""
     name = models.CharField(max_length=256, verbose_name='Имя жанра')
     slug = models.SlugField(unique=True, verbose_name='Слаг жанра')
 
@@ -67,6 +68,7 @@ class Genre(models.Model):
 
 
 class Category(models.Model):
+    """Категории произведений"""
     name = models.CharField(max_length=256, verbose_name='Имя категории')
     slug = models.SlugField(unique=True, verbose_name='Слаг категории')
 
@@ -76,6 +78,7 @@ class Category(models.Model):
 
 
 class Title(models.Model):
+    """Произведения, к которым пишут отзывы"""
     name = models.CharField(max_length=150, verbose_name='Название')
     year = models.IntegerField(
         validators=(validation_year,),
@@ -149,17 +152,17 @@ class Comment(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name = 'Автор'
+        verbose_name='Автор'
     )
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name = 'Отзыв'
+        verbose_name='Отзыв'
     )
-    text = models.TextField(blank=False, verbose_name = 'Текст комментария')
+    text = models.TextField(blank=False, verbose_name='Текст комментария')
     created = models.DateTimeField(
-        verbose_name = 'Дата добавления',
+        verbose_name='Дата добавления',
         auto_now_add=True,
         db_index=True
     )

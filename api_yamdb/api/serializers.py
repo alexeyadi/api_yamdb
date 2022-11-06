@@ -1,19 +1,38 @@
 
-from rest_framework.serializers import ModelSerializer, SlugRelatedField, ValidationError
-from rest_framework.validators import UniqueTogetherValidator
+from rest_framework.serializers import ModelSerializer, SlugRelatedField, ValidationError, CharField, EmailField, Serializer
+from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from reviews.models import Comment, Review, User
 
 
 class UserSerializer(ModelSerializer):
+    username = CharField(validators=[UniqueValidator(
+        queryset=User.objects.all())],
+        required=True,
+    )
+    email = EmailField(validators=[UniqueValidator(
+        queryset=User.objects.all())],
+        required=True,
+    )
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'role', 'bio', )
+        fields = ('username',
+                  'email',
+                  'first_name',
+                  'last_name',
+                  'role',
+                  'bio'
+                  )
 
     def validate_username(self, username):
         if username == 'me':
-            raise ValidationError('Нельзя использовать имя "me"!')
+            raise ValidationError('You can not use "me"!')
         return username
+
+
+class JWTTokenSerializer(Serializer):
+    username = CharField()
+    confirmation_code = CharField()
 
 
 class ReviewSerializer(ModelSerializer):

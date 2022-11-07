@@ -1,14 +1,50 @@
-
+from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import mixins, viewsets
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from api.serializers import CommentSerializer, ReviewSerializer, UserSerializer
 
-from .permissions import IsAuthorPermission
-from reviews.models import Title, User
+
+from api.filters import TitleFilter
+from reviews.models import Category, Genre, Review, Title, User
+from .permissions import (IsAdminModeratorAuthorPermission, IsAdminOrReadOnly,
+                          IsAdminUserPermission)
+from .serializers import (CategorySerializer, CommentSerializer,
+                          GenreSerializer, ReviewSerializer,
+                          TitleSerializer, UserSerializer)
+
+
+class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
+                   mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminUserPermission,)
+    filter_backends = (SearchFilter,)
+    search_fields = ('name', )
+
+
+class CategoryViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
+                      mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminUserPermission,)
+    filter_backends = (SearchFilter,)
+    search_fields = ('name', )
+
+
+class TitleViewSet(ModelViewSet):
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
+    serializer_class = TitleSerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminUserPermission,)
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = TitleFilter
 
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -89,10 +125,7 @@ class UserViewSet(ModelViewSet):
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = [
-        IsAuthenticatedOrReadOnly,
-        IsAuthorPermission
-    ]
+    permission_classes = (IsAdminModeratorAuthorPermission,)
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -109,10 +142,7 @@ class ReviewViewSet(ModelViewSet):
 
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = [
-        IsAuthenticatedOrReadOnly,
-        IsAuthorPermission
-    ]
+    permission_classes = (IsAdminModeratorAuthorPermission,)
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))

@@ -2,6 +2,7 @@ from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, viewsets
+
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
@@ -21,7 +22,6 @@ from rest_framework import permissions, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from django.shortcuts import get_object_or_404
 
 
 class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
@@ -70,6 +70,7 @@ def sign_up(request):
         recipient_list=[user.email],
     )
     return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
@@ -126,7 +127,7 @@ class ReviewViewSet(ModelViewSet):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         return title.review.all()
 
-    def perform_create(self, serializer): #ToDO Make correct validation
+    def perform_create(self, serializer): # TODO Make correct validation
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
         # if Review.objects.filter(author=self.request.user, title=title_id).exists():

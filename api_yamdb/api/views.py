@@ -5,20 +5,14 @@ from rest_framework import mixins, viewsets
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.viewsets import ModelViewSet
-from reviews.models import Category, Genre, Review, Title, User
 
 from .filters import TitleFilter
-from .permissions import (IsAdminModeratorAuthorPermission,
-                          IsAdminUserPermission)
+from .permissions import IsAdminUserPermission, IsAdminModeratorAuthorPermission, IsAdminOrReadOnly
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, TitleSerializer,
                           UserSerializer)
 
-
-class UserViewSet(ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    # permission_classes
+from reviews.models import Category, Comment, Genre, Title, Review, User
 
 
 class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
@@ -78,3 +72,10 @@ class CommentViewSet(ModelViewSet):
     def perform_create(self, serializer):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review=review)
+
+
+class UserViewSet(ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    # permission_classes
+

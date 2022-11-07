@@ -2,11 +2,10 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 
 class IsAdminOrReadOnly(BasePermission):
-'''Ограничение на активные действия с объектом, если пользователь не является админом.'''
+    '''Ограничение на активные действия с объектом, если пользователь не является админом.'''
     def has_permission(self, request, view):
         return (request.method in SAFE_METHODS
                 or request.user.is_admin or request.user.is_superuser)
-
 
 
 class IsAdminUserPermission(BasePermission):

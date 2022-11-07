@@ -53,6 +53,7 @@ class ReviewSerializer(ModelSerializer):
     )
 
     class Meta:
+        # fields = ('id', 'author', 'title', 'text', 'score', 'pub_date',)
         fields = '__all__'
         model = Review
         validators = [

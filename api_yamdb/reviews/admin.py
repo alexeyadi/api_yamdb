@@ -11,7 +11,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('review', 'text', 'author', 'pub_date',)
+    list_display = ('review', 'text', 'author', 'created',)
     search_fields = ('review',)
     list_filter = ('review',)
     empty_value_display = '-пусто-'
@@ -26,8 +26,8 @@ class GenreAdmin(admin.ModelAdmin):
 
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ('title', 'text', 'author', 'score',)
-    search_fields = ('pub_date',)
-    list_filter = ('pub_date',)
+    search_fields = ('title',)
+    list_filter = ('score',)
     empty_value_display = '-пусто-'
 
 

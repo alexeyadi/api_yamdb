@@ -17,7 +17,7 @@ TABLES = {
 
 class Command(BaseCommand):
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **kwargs):
         for model, csv_file in TABLES.items():
             with open(
                 f'{settings.BASE_DIR}/static/data/{csv_file}',
@@ -27,3 +27,4 @@ class Command(BaseCommand):
                 reader = csv.DictReader(csv_files)
                 model.objects.bulk_create(
                     model(**data) for data in reader)
+        self.stdout.write(self.style.SUCCESS('Данные загруженны'))

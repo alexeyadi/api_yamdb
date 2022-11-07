@@ -1,5 +1,10 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
+ROLES_FOR_MODIFY = (
+    'moderator',
+    'admin',
+)
+
 
 class IsAdminOrReadOnly(BasePermission):
     '''Ограничение на активные действия с объектом, если пользователь не является админом.'''

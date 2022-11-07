@@ -7,15 +7,21 @@ from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-
-
 from api.filters import TitleFilter
 from reviews.models import Category, Genre, Review, Title, User
 from .permissions import (IsAdminModeratorAuthorPermission, IsAdminOrReadOnly,
                           IsAdminUserPermission)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
-                          TitleSerializer, UserSerializer)
+                          TitleSerializer, UserSerializer,
+                          JWTTokenSerializer)
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from rest_framework import permissions, status
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import AccessToken
+from django.shortcuts import get_object_or_404
 
 
 class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
@@ -46,16 +52,6 @@ class TitleViewSet(ModelViewSet):
     filter_backends = (DjangoFilterBackend, )
     filterset_class = TitleFilter
 
-from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
-from rest_framework import permissions, status
-from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import AccessToken
-from .permissions import IsAdmin
-from django.shortcuts import get_object_or_404
-
-
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def sign_up(request):
@@ -74,7 +70,6 @@ def sign_up(request):
         recipient_list=[user.email],
     )
     return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
@@ -97,7 +92,7 @@ class UserViewSet(ModelViewSet):
     lookup_field = 'username'
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAdmin, )
+    permission_classes = (IsAdminOrReadOnly, )
     pagination_class = PageNumberPagination
 
     @action(

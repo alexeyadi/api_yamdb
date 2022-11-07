@@ -40,7 +40,7 @@ class ReviewAdmin(admin.ModelAdmin):
 
 
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('review', 'text', 'author', 'created',)
+    list_display = ('review', 'text', 'author', 'pub_date',)
     search_fields = ('review',)
     list_filter = ('review',)
     empty_value_display = '-пусто-'

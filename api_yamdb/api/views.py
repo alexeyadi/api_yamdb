@@ -127,7 +127,7 @@ class ReviewViewSet(ModelViewSet):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         return title.review.all()
 
-    def perform_create(self, serializer): #ToDO Make correct validation
+    def perform_create(self, serializer): # TODO Make correct validation
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
         # if Review.objects.filter(author=self.request.user, title=title_id).exists():

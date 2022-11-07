@@ -1,14 +1,15 @@
 from rest_framework.validators import UniqueValidator
 from reviews.models import User
 
-from rest_framework.serializers import (IntegerField, ModelSerializer, 
-                                        SlugRelatedField, ValidationError, 
+from rest_framework.serializers import (IntegerField, ModelSerializer,
+                                        SlugRelatedField, ValidationError,
                                         CharField, EmailField, Serializer)
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
 class UserSerializer(ModelSerializer):
+    """Сериалайзер для юзера."""
     username = CharField(validators=[UniqueValidator(
         queryset=User.objects.all())],
         required=True,
@@ -35,8 +36,10 @@ class UserSerializer(ModelSerializer):
 
 
 class JWTTokenSerializer(Serializer):
+    """Сериалайзер JWT токена."""
     username = CharField()
     confirmation_code = CharField()
+
 
 class ReviewSerializer(ModelSerializer):
     """Сериалайзер для отзывов на произведения."""

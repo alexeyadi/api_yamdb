@@ -1,8 +1,9 @@
 
-from rest_framework.serializers import IntegerField, ModelSerializer, SlugRelatedField, ValidationError, CharField, EmailField, Serializer
+from rest_framework.serializers import (IntegerField, ModelSerializer, 
+                                        SlugRelatedField, ValidationError, 
+                                        CharField, EmailField, Serializer)
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from reviews.models import Category, Comment, Genre, Review, Title, User
-
 
 
 class UserSerializer(ModelSerializer):
@@ -24,8 +25,6 @@ class UserSerializer(ModelSerializer):
                   'role',
                   'bio'
                   )
-
-
 
     def validate_username(self, username):
         if username == 'me':
@@ -65,6 +64,7 @@ class CommentSerializer(ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Comment
+
 
 class GenreSerializer(ModelSerializer):
     """Сериалайзер для жанров произведений"""

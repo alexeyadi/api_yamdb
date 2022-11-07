@@ -10,6 +10,7 @@ ADMIN = 'admin'
 
 
 class User(AbstractUser):
+    """"Пользователь."""
     # USER = 'user' TODO Вернуть - исходная версия
     # MODER = 'moderator' TODO Вернуть - исходная версия
     # ADMIN = 'admin' TODO Вернуть - исходная версия
@@ -43,13 +44,17 @@ class User(AbstractUser):
         blank=True,)
 
     @property
+    def is_user(self):
+        return self.role == USER
+
+    @property
     def is_moderator(self):
-        #return self.role == self.MODER TODO Вернуть - исходная версия
-        return self.role == MODER # TODO Моя версия
+        # return self.role == self.MODER TODO Вернуть - исходная версия
+        return self.role == MODER  # TODO Моя версия
 
     @property
     def is_admin(self):
-        #return self.role == self.ADMIN TODO Вернуть - исходная версия
+        # return self.role == self.ADMIN TODO Вернуть - исходная версия
         return self.role == ADMIN # TODO Моя версия
 
     class Meta:
@@ -153,7 +158,7 @@ class Review(models.Model):
         constraints = [
             models.UniqueConstraint(
                 #fields=['author', title.title._check_id_field()], name='unique_review' TODO Убрать, если вариант ниже сработает
-                fields = ['author', 'title'], name = 'unique_review',
+                fields=['author', 'title'], name='unique_review',
             )
         ]
 

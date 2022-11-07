@@ -37,8 +37,12 @@ class UserSerializer(ModelSerializer):
 
 class JWTTokenSerializer(Serializer):
     """Сериалайзер JWT токена."""
-    username = CharField()
-    confirmation_code = CharField()
+    username = CharField(required=True)
+    confirmation_code = CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'confirmation_code')
 
 
 class ReviewSerializer(ModelSerializer):
@@ -66,7 +70,7 @@ class CommentSerializer(ModelSerializer):
     )
 
     class Meta:
-        fields = '__all__'
+        field = '__all__'
         model = Comment
 
 
@@ -74,16 +78,18 @@ class GenreSerializer(ModelSerializer):
     """Сериалайзер для жанров произведений"""
 
     class Meta:
-        fields = '__all__'
+        exclude = ('id', )
         model = Genre
+        lookup_field = 'slug'
 
 
 class CategorySerializer(ModelSerializer):
     """Сериалайзер для категорий произведений"""
 
     class Meta:
-        fields = '__all__'
+        exclude = ('id', )
         model = Category
+        lookup_field = 'slug'
 
 
 class TitleSerializer(ModelSerializer):

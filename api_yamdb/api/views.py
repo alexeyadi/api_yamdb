@@ -24,33 +24,36 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 
-class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
-                   mixins.DestroyModelMixin, viewsets.GenericViewSet):
-    queryset = Genre.objects.all()
-    serializer_class = GenreSerializer
-    pagination_class = LimitOffsetPagination
-    permission_classes = (IsAdminUserPermission,)
-    filter_backends = (SearchFilter,)
-    search_fields = ('name', )
+class UserViewSet(ModelViewSet):
+    lookup_field = 'username'
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (IsAdminOrReadOnly, )
+    pagination_class = PageNumberPagination
+    filter_backends = (SearchFilter, )
+    search_fields = ('username', )
 
+    @action(
+        methods=['get', 'patch'],
+        detail=False,
+        url_path='me',
+        permission_classes=[permissions.IsAuthenticated],
+    )
+    def get_me(self, request):
+        if request.method == 'GET':
+            serializer = UserSerializer(request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        if request.method == 'PATCH':
+            serializer = UserSerializer(
+                request.user,
+                data=request.data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-class CategoryViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
-                      mixins.DestroyModelMixin, viewsets.GenericViewSet):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    pagination_class = LimitOffsetPagination
-    permission_classes = (IsAdminUserPermission,)
-    filter_backends = (SearchFilter,)
-    search_fields = ('name', )
-
-
-class TitleViewSet(ModelViewSet):
-    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
-    serializer_class = TitleSerializer
-    pagination_class = LimitOffsetPagination
-    permission_classes = (IsAdminUserPermission,)
-    filter_backends = (DjangoFilterBackend, )
-    filterset_class = TitleFilter
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
@@ -89,33 +92,33 @@ def get_jwt_token(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserViewSet(ModelViewSet):
-    lookup_field = 'username'
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = (IsAdminOrReadOnly, )
-    pagination_class = PageNumberPagination
+class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
+                   mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (SearchFilter,)
+    search_fields = ('name', )
 
-    @action(
-        methods=['get', 'patch'],
-        detail=False,
-        url_path='me',
-        permission_classes=[permissions.IsAuthenticated],
-    )
-    def get_me(self, request):
-        if request.method == 'GET':
-            serializer = UserSerializer(request.user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        if request.method == 'PATCH':
-            serializer = UserSerializer(
-                request.user,
-                data=request.data,
-                partial=True
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+class CategoryViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
+                      mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (SearchFilter,)
+    search_fields = ('name', )
+
+
+class TitleViewSet(ModelViewSet):
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
+    serializer_class = TitleSerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminUserPermission,)
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = TitleFilter
 
 
 class ReviewViewSet(ModelViewSet):

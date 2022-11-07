@@ -44,6 +44,15 @@ class CategoryViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     search_fields = ('name', )
 
 
+class TitleViewSet(ModelViewSet):
+    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
+    serializer_class = TitleSerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminUserPermission,)
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = TitleFilter
+
+
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def sign_up(request):

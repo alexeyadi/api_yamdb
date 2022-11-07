@@ -14,7 +14,7 @@ from .permissions import (IsAdminModeratorAuthorPermission, IsAdminOrReadOnly,
                           IsAdminUserPermission)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
-                          TitleSerializer, UserSerializer,
+                          TitleSerializer, UserSerializer, UserEditSerializer,
                           JWTTokenSerializer)
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -24,35 +24,24 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 
-class UserViewSet(ModelViewSet):
-    lookup_field = 'username'
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = (IsAdminOrReadOnly, )
-    pagination_class = PageNumberPagination
-    filter_backends = (SearchFilter, )
-    search_fields = ('username', )
+class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
+                   mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (SearchFilter,)
+    search_fields = ('name', )
 
-    @action(
-        methods=['get', 'patch'],
-        detail=False,
-        url_path='me',
-        permission_classes=[permissions.IsAuthenticated],
-    )
-    def get_me(self, request):
-        if request.method == 'GET':
-            serializer = UserSerializer(request.user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        if request.method == 'PATCH':
-            serializer = UserSerializer(
-                request.user,
-                data=request.data,
-                partial=True
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+class CategoryViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
+                      mixins.DestroyModelMixin, viewsets.GenericViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (SearchFilter,)
+    search_fields = ('name', )
 
 
 @api_view(['POST'])
@@ -92,33 +81,33 @@ def get_jwt_token(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
-                   mixins.DestroyModelMixin, viewsets.GenericViewSet):
-    queryset = Genre.objects.all()
-    serializer_class = GenreSerializer
-    pagination_class = LimitOffsetPagination
+class UserViewSet(ModelViewSet):
+    lookup_field = 'username'
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
     permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = (SearchFilter,)
-    search_fields = ('name', )
+    pagination_class = PageNumberPagination
 
-
-class CategoryViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
-                      mixins.DestroyModelMixin, viewsets.GenericViewSet):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    pagination_class = LimitOffsetPagination
-    permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = (SearchFilter,)
-    search_fields = ('name', )
-
-
-class TitleViewSet(ModelViewSet):
-    queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
-    serializer_class = TitleSerializer
-    pagination_class = LimitOffsetPagination
-    permission_classes = (IsAdminUserPermission,)
-    filter_backends = (DjangoFilterBackend, )
-    filterset_class = TitleFilter
+    @action(
+        methods=['get', 'patch'],
+        detail=False,
+        url_path='me',
+        permission_classes=[permissions.IsAuthenticated],
+    )
+    def get_me(self, request):
+        if request.method == 'GET':
+            serializer = UserSerializer(request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        if request.method == 'PATCH':
+            serializer = UserEditSerializer(
+                request.user,
+                data=request.data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class ReviewViewSet(ModelViewSet):
@@ -128,8 +117,9 @@ class ReviewViewSet(ModelViewSet):
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
-        return title.review.all()
+        return title.reviews.all()
 
+    # @permission_classes(permissions.IsAuthenticated)
     def perform_create(self, serializer): # TODO Make correct validation
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
@@ -145,7 +135,7 @@ class CommentViewSet(ModelViewSet):
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
-        return review.comment.all()
+        return review.comments.all()
 
     def perform_create(self, serializer):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))

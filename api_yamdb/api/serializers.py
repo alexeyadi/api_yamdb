@@ -35,6 +35,18 @@ class UserSerializer(ModelSerializer):
         return username
 
 
+class UserEditSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username',
+                  'email',
+                  'first_name',
+                  'last_name',
+                  'role',
+                  'bio')
+        read_only_fields = ('role',)
+
+
 class JWTTokenSerializer(Serializer):
     """Сериалайзер JWT токена."""
     username = CharField(required=True)
@@ -52,8 +64,8 @@ class ReviewSerializer(ModelSerializer):
     )
 
     class Meta:
-        # fields = ('id', 'author', 'title', 'text', 'score', 'pub_date',)
-        fields = '__all__'
+        fields = ('id', 'author', 'title', 'text', 'score', 'pub_date',)
+        # fields = '__all__'
         model = Review
         validators = [
             UniqueTogetherValidator(
@@ -70,7 +82,8 @@ class CommentSerializer(ModelSerializer):
     )
 
     class Meta:
-        field = '__all__'
+        # fields = ('id', 'author', 'review', 'text', 'pub_date',)
+        fields = '__all__'
         model = Comment
 
 

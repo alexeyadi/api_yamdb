@@ -152,8 +152,8 @@ class Review(models.Model):
         verbose_name_plural = 'Отзывы'
         constraints = [
             models.UniqueConstraint(
-                #fields=['author', title.title._check_id_field()], name='unique_review' TODO Убрать, если вариант ниже сработает
-                fields = ['author', 'title'], name = 'unique_review',
+        #         #fields=['author', title.title._check_id_field()], name='unique_review' TODO Убрать, если вариант ниже сработает
+                fields=['author', 'title'], name='unique_review',
             )
         ]
 
@@ -189,3 +189,5 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text[:10]
+
+

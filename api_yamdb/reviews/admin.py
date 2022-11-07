@@ -3,6 +3,21 @@ from django.contrib import admin
 from .models import Category, Comment, Genre, Review, Title, User
 
 
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'email', 'role', 'bio',
+                    'first_name', 'last_name',)
+    search_fields = ('username', 'role',)
+    list_filter = ('username',)
+    empty_value_display = '-пусто-'
+
+
+class GenreAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug',)
+    search_fields = ('name',)
+    list_filter = ('name',)
+    empty_value_display = '-пусто-'
+
+
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug',)
     search_fields = ('name',)
@@ -10,15 +25,8 @@ class CategoryAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-class CommentAdmin(admin.ModelAdmin):
-    list_display = ('review', 'text', 'author', 'created',)
-    search_fields = ('review',)
-    list_filter = ('review',)
-    empty_value_display = '-пусто-'
-
-
-class GenreAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug',)
+class TitleAdmin(admin.ModelAdmin):
+    list_display = ('name', 'year', 'category', 'description',)
     search_fields = ('name',)
     list_filter = ('name',)
     empty_value_display = '-пусто-'
@@ -31,18 +39,10 @@ class ReviewAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-class TitleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'year', 'category', 'description',)
-    search_fields = ('name',)
-    list_filter = ('name',)
-    empty_value_display = '-пусто-'
-
-
-class UserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'role', 'bio',
-                    'first_name', 'last_name',)
-    search_fields = ('username', 'role',)
-    list_filter = ('username',)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('review', 'text', 'author', 'created',)
+    search_fields = ('review',)
+    list_filter = ('review',)
     empty_value_display = '-пусто-'
 
 

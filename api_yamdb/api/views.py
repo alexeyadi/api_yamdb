@@ -48,7 +48,7 @@ class TitleViewSet(ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
     serializer_class = TitleSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (IsAdminUserPermission,)
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend, )
     filterset_class = TitleFilter
 

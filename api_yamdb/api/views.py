@@ -14,7 +14,7 @@ from .permissions import (IsAdminModeratorAuthorPermission, IsAdminOrReadOnly,
                           IsAdminUserPermission)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
-                          TitleSerializer, UserSerializer,
+                          TitleSerializer, UserSerializer, UserEditSerializer,
                           JWTTokenSerializer)
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -29,7 +29,7 @@ class GenreViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (IsAdminUserPermission,)
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (SearchFilter,)
     search_fields = ('name', )
 
@@ -39,7 +39,7 @@ class CategoryViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (IsAdminUserPermission,)
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (SearchFilter,)
     search_fields = ('name', )
 
@@ -51,6 +51,7 @@ class TitleViewSet(ModelViewSet):
     permission_classes = (IsAdminUserPermission,)
     filter_backends = (DjangoFilterBackend, )
     filterset_class = TitleFilter
+
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
@@ -93,7 +94,7 @@ class UserViewSet(ModelViewSet):
     lookup_field = 'username'
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAdminOrReadOnly, )
+    permission_classes = (IsAdminOrReadOnly,)
     pagination_class = PageNumberPagination
 
     @action(
@@ -107,7 +108,7 @@ class UserViewSet(ModelViewSet):
             serializer = UserSerializer(request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         if request.method == 'PATCH':
-            serializer = UserSerializer(
+            serializer = UserEditSerializer(
                 request.user,
                 data=request.data,
                 partial=True
@@ -125,8 +126,9 @@ class ReviewViewSet(ModelViewSet):
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
-        return title.review.all()
+        return title.reviews.all()
 
+    # @permission_classes(permissions.IsAuthenticated)
     def perform_create(self, serializer): # TODO Make correct validation
         title_id = self.kwargs.get('title_id')
         title = get_object_or_404(Title, pk=title_id)
@@ -142,7 +144,7 @@ class CommentViewSet(ModelViewSet):
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
-        return review.comment.all()
+        return review.comments.all()
 
     def perform_create(self, serializer):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))

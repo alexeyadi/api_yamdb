@@ -35,7 +35,7 @@ class UserSerializer(ModelSerializer):
         return username
 
 
-class UserEditSerializer(ModelSerializer):
+class CreateUserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ('username',
@@ -45,6 +45,24 @@ class UserEditSerializer(ModelSerializer):
                   'role',
                   'bio')
         read_only_fields = ('role',)
+
+
+class SignUpSerializer(ModelSerializer):
+    username = CharField(
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    email = EmailField(
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+
+    def validate_username(self, username):
+        if username == 'me':
+            raise ValidationError('You can not use "me"!')
+        return username
+
+    class Meta:
+        fields = ("username", "email")
+        model = User
 
 
 class JWTTokenSerializer(Serializer):

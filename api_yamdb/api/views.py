@@ -14,8 +14,10 @@ from .permissions import (IsAdminModeratorAuthorPermission, IsAdminOrReadOnly,
                           IsAdminUserPermission, IsAdmin)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
-                          TitleSerializer, UserSerializer, CreateUserSerializer,
+                          TitleReadSerializer, 
+                          UserSerializer, CreateUserSerializer,
                           JWTTokenSerializer, SignUpSerializer)
+
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from rest_framework import permissions, status
@@ -46,11 +48,15 @@ class CategoryViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
 
 class TitleViewSet(ModelViewSet):
     queryset = Title.objects.all().annotate(rating=Avg('reviews__score'))
-    serializer_class = TitleSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend, )
     filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.action in ('list', 'retrieve'):
+            return TitleReadSerializer
+        return TitleWriteSerializer
 
 
 class UserViewSet(ModelViewSet):

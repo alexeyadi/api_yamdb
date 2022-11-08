@@ -6,16 +6,16 @@ from rest_framework import mixins, viewsets
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from api.filters import TitleFilter
 from reviews.models import Category, Genre, Review, Title, User
 from .permissions import (IsAdminModeratorAuthorPermission, IsAdminOrReadOnly,
-                          IsAdminUserPermission)
+                          IsAdminUserPermission, IsAdmin)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
-                          TitleSerializer, UserSerializer, UserEditSerializer,
-                          JWTTokenSerializer)
+                          TitleSerializer, UserSerializer, CreateUserSerializer,
+                          JWTTokenSerializer, SignUpSerializer)
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from rest_framework import permissions, status
@@ -53,10 +53,40 @@ class TitleViewSet(ModelViewSet):
     filterset_class = TitleFilter
 
 
+class UserViewSet(ModelViewSet):
+    lookup_field = 'username'
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (IsAdmin, )
+    pagination_class = PageNumberPagination
+
+    @action(
+        methods=['get', 'patch'],
+        detail=False,
+        url_path='me',
+        permission_classes=[IsAuthenticated],
+        serializer_class=UserSerializer,
+    )
+    def get_me(self, request):
+        if request.method == 'GET':
+            serializer = UserSerializer(request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        if request.method == 'PATCH':
+            serializer = CreateUserSerializer(
+                request.user,
+                data=request.data,
+                partial=True
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
 @api_view(['POST'])
-@permission_classes([permissions.AllowAny])
+@permission_classes([AllowAny])
 def sign_up(request):
-    serializer = UserSerializer(data=request.data)
+    serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
     user = get_object_or_404(
@@ -74,7 +104,7 @@ def sign_up(request):
 
 
 @api_view(['POST'])
-@permission_classes([permissions.AllowAny])
+@permission_classes([AllowAny])
 def get_jwt_token(request):
     serializer = JWTTokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -88,35 +118,6 @@ def get_jwt_token(request):
         token = AccessToken.for_user(user)
         return Response({'JWT token': str(token)}, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class UserViewSet(ModelViewSet):
-    lookup_field = 'username'
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = PageNumberPagination
-
-    @action(
-        methods=['get', 'patch'],
-        detail=False,
-        url_path='me',
-        permission_classes=[permissions.IsAuthenticated],
-    )
-    def get_me(self, request):
-        if request.method == 'GET':
-            serializer = UserSerializer(request.user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        if request.method == 'PATCH':
-            serializer = UserEditSerializer(
-                request.user,
-                data=request.data,
-                partial=True
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 class ReviewViewSet(ModelViewSet):

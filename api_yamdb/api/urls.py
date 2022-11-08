@@ -2,17 +2,11 @@ from django.urls import include, path
 
 from rest_framework.routers import DefaultRouter
 
-from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-#from rest_framework_simplejwt.views import (
-#    TokenObtainPairView,
-#    TokenRefreshView,
-#    TokenVerifyView,
-#)
-
 from .views import (CategoryViewSet, CommentViewSet, GenreViewSet,
-                    ReviewViewSet, TitleViewSet, UserViewSet, sign_up)
+                    ReviewViewSet, TitleViewSet, UserViewSet, sign_up,
+                    get_jwt_token)
 
 app_name = 'api'
 
@@ -31,7 +25,8 @@ v1_router.register('genres', GenreViewSet, basename='genres')
 
 urlpatterns = [
     path('v1/', include(v1_router.urls)),
-    # TODO: create user with Simple JWT
-    path('v1/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('v1/auth/token/',
+         get_jwt_token,
+         name='token_obtain_pair'),
     path('v1/auth/signup/', sign_up, name='signup'),
 ]

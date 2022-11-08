@@ -39,3 +39,9 @@ class IsAdminModeratorAuthorPermission(BasePermission):
         return (request.method in SAFE_METHODS
                 or obj.author == request.user
                 or request.user.role in ROLES_FOR_MODIFY)
+
+
+class IsAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and (
+            request.user.is_admin or request.user.is_superuser)

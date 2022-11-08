@@ -57,6 +57,48 @@ class JWTTokenSerializer(Serializer):
         fields = ('username', 'confirmation_code')
 
 
+class GenreSerializer(ModelSerializer):
+    """Сериалайзер для жанров произведений"""
+
+    class Meta:
+        exclude = ('id', )
+        model = Genre
+        lookup_field = 'slug'
+
+
+class CategorySerializer(ModelSerializer):
+    """Сериалайзер для категорий произведений"""
+
+    class Meta:
+        exclude = ('id', )
+        model = Category
+        lookup_field = 'slug'
+
+
+class TitleReadSerializer(ModelSerializer):
+    """Сериалайзер для Произведения, к которым пишут отзывы"""
+    category = CategorySerializer(read_only=True)
+    genre = GenreSerializer(read_only=True, many=True)
+    rating = IntegerField(read_only=True)
+
+    class Meta:
+        fields = '__all__'
+        model = Title
+
+
+class TitleWriteSerializer(ModelSerializer):
+    """Сериалайзер для Произведения, к которым пишут отзывы"""
+    category = SlugRelatedField(
+        queryset=Category.objects.all(), slug_field='slug')
+    genre = SlugRelatedField(
+        queryset=Genre.objects.all(), slug_field='slug',
+        many=True)
+
+    class Meta:
+        fields = '__all__'
+        model = Title
+
+
 class ReviewSerializer(ModelSerializer):
     """Сериалайзер для отзывов на произведения."""
     author = SlugRelatedField(
@@ -85,35 +127,3 @@ class CommentSerializer(ModelSerializer):
         # fields = ('id', 'author', 'review', 'text', 'pub_date',)
         fields = '__all__'
         model = Comment
-
-
-class GenreSerializer(ModelSerializer):
-    """Сериалайзер для жанров произведений"""
-
-    class Meta:
-        exclude = ('id', )
-        model = Genre
-        lookup_field = 'slug'
-
-
-class CategorySerializer(ModelSerializer):
-    """Сериалайзер для категорий произведений"""
-
-    class Meta:
-        exclude = ('id', )
-        model = Category
-        lookup_field = 'slug'
-
-
-class TitleSerializer(ModelSerializer):
-    """Сериалайзер для Произведения, к которым пишут отзывы"""
-    category = SlugRelatedField(
-        queryset=Category.objects.all(), slug_field='slug')
-    genre = SlugRelatedField(
-        queryset=Genre.objects.all(), slug_field='slug',
-        many=True)
-    rating = IntegerField(read_only=True)
-
-    class Meta:
-        fields = '__all__'
-        model = Title

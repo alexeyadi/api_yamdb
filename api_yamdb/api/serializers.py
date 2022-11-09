@@ -1,10 +1,9 @@
+from django.shortcuts import get_object_or_404
+from rest_framework.serializers import (CharField, EmailField, IntegerField,
+                                        ModelSerializer, Serializer,
+                                        SlugRelatedField, ValidationError)
 from rest_framework.validators import UniqueValidator
-from reviews.models import User
 
-from rest_framework.serializers import (IntegerField, ModelSerializer,
-                                        SlugRelatedField, ValidationError,
-                                        CharField, EmailField, Serializer)
-from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 
@@ -36,6 +35,8 @@ class UserSerializer(ModelSerializer):
 
 
 class CreateUserSerializer(ModelSerializer):
+    """Сериалайзер для создания юзера."""
+
     class Meta:
         model = User
         fields = ('username',
@@ -48,6 +49,7 @@ class CreateUserSerializer(ModelSerializer):
 
 
 class SignUpSerializer(ModelSerializer):
+    """Сериалайзер для регистрации."""
     username = CharField(
         validators=[UniqueValidator(queryset=User.objects.all())]
     )
@@ -61,8 +63,8 @@ class SignUpSerializer(ModelSerializer):
         return username
 
     class Meta:
-        fields = ("username", "email")
         model = User
+        fields = ("username", "email")
 
 
 class JWTTokenSerializer(Serializer):
@@ -76,21 +78,19 @@ class JWTTokenSerializer(Serializer):
 
 
 class GenreSerializer(ModelSerializer):
-    """Сериалайзер для жанров произведений"""
+    """Сериалайзер для жанров произведений."""
 
     class Meta:
-        exclude = ('id', )
         model = Genre
-        lookup_field = 'slug'
+        fields = ('name', 'slug')
 
 
 class CategorySerializer(ModelSerializer):
-    """Сериалайзер для категорий произведений"""
+    """Сериалайзер для категорий произведений."""
 
     class Meta:
-        exclude = ('id', )
         model = Category
-        lookup_field = 'slug'
+        fields = ('name', 'slug')
 
 
 class TitleReadSerializer(ModelSerializer):
@@ -100,48 +100,59 @@ class TitleReadSerializer(ModelSerializer):
     rating = IntegerField(read_only=True)
 
     class Meta:
-        fields = '__all__'
         model = Title
+        fields = '__all__'
 
 
 class TitleWriteSerializer(ModelSerializer):
     """Сериалайзер для Произведения, к которым пишут отзывы"""
     category = SlugRelatedField(
-        queryset=Category.objects.all(), slug_field='slug')
+        queryset=Category.objects.all(), slug_field='slug'
+    )
     genre = SlugRelatedField(
-        queryset=Genre.objects.all(), slug_field='slug',
-        many=True)
+        queryset=Genre.objects.all(), slug_field='slug', many=True
+    )
 
     class Meta:
-        fields = '__all__'
         model = Title
+        fields = '__all__'
 
 
 class ReviewSerializer(ModelSerializer):
     """Сериалайзер для отзывов на произведения."""
+    title = SlugRelatedField(
+        slug_field='name', read_only=True
+    )
     author = SlugRelatedField(
         read_only=True, slug_field='username'
     )
 
+    def validate(self, data):
+        request = self.context['request']
+        author = request.user
+        title_id = self.context.get('view').kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        if (
+            request.method == 'POST'
+            and Review.objects.filter(title=title, author=author).exists()
+        ):
+            raise ValidationError('Может существовать только один отзыв!')
+        return data
+
     class Meta:
-        fields = ('id', 'author', 'title', 'text', 'score', 'pub_date',)
-        # fields = '__all__'
         model = Review
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Review.objects.all(),
-                fields=('user', 'title')
-            )
-        ]
+        fields = '__all__'
 
 
 class CommentSerializer(ModelSerializer):
     """Сериалайзер для комментариев к отзывам."""
+    review = SlugRelatedField(
+        slug_field='text', read_only=True
+    )
     author = SlugRelatedField(
         read_only=True, slug_field='username'
     )
 
     class Meta:
-        # fields = ('id', 'author', 'review', 'text', 'pub_date',)
-        fields = '__all__'
         model = Comment
+        fields = '__all__'

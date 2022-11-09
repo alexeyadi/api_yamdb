@@ -1,5 +1,5 @@
 # api_yamdb
-Автор: @alexeyadi, @Help0, @Nata-Sata
+Авторы: @alexeyadi, @Helep0, @Nata-Sata
 
 ### Описание проекта:
 

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.management import BaseCommand
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
+
 TABLES = {
     User: 'users.csv',
     Category: 'category.csv',

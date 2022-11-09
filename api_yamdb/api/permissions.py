@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
+
 ROLES_FOR_MODIFY = (
     'moderator',
     'admin',

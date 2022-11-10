@@ -19,7 +19,7 @@ from .permissions import (IsAdmin, IsAdminModeratorAuthorPermission,
                           IsAdminOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
                           CreateUserSerializer, GenreSerializer,
-                          JWTTokenSerializer, ReviewSerializer,
+                          ConfirmationCodeSerializer, ReviewSerializer,
                           SignUpSerializer, TitleReadSerializer,
                           TitleWriteSerializer, UserSerializer)
 
@@ -77,7 +77,7 @@ def sign_up(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_jwt_token(request):
-    serializer = JWTTokenSerializer(data=request.data)
+    serializer = ConfirmationCodeSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = get_object_or_404(
         User,

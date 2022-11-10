@@ -34,4 +34,6 @@ class IsAdminModeratorAuthorPermission(BasePermission):
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated and (
-            request.user.is_admin or request.user.is_superuser)
+            request.user.is_admin
+            or request.user.is_superuser
+            or request.user.is_staff)

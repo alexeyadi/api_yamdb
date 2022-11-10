@@ -21,8 +21,12 @@ v1_router.register('titles', TitleViewSet, basename='titles')
 v1_router.register('genres', GenreViewSet, basename='genres')
 
 
+jwtpatterns = [
+    path('token/', get_jwt_token, name='token_obtain_pair'),
+    path('signup/', sign_up, name='signup'),
+]
+
 urlpatterns = [
-    path('v1/', include(v1_router.urls)),
-    path('v1/auth/token/', get_jwt_token, name='token_obtain_pair'),
-    path('v1/auth/signup/', sign_up, name='signup'),
+    path('', include(v1_router.urls)),
+    path('auth/', include(jwtpatterns)),
 ]

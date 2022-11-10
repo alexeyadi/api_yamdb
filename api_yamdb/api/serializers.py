@@ -66,7 +66,7 @@ class SignUpSerializer(ModelSerializer):
         fields = ("username", "email")
 
 
-class JWTTokenSerializer(Serializer):
+class ConfirmationCodeSerializer(Serializer):
     """Сериалайзер JWT токена."""
     username = CharField(required=True)
     confirmation_code = CharField(required=True)

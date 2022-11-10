@@ -86,7 +86,7 @@ class Category(models.Model):
 class Title(models.Model):
     """Произведения, к которым пишут отзывы."""
     name = models.CharField(max_length=150, verbose_name='Название')
-    year = models.IntegerField(
+    year = models.PositiveIntegerField(
         validators=(validation_year,),
         verbose_name='Год выпуска')
     description = models.CharField(
@@ -186,4 +186,4 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def __str__(self):
-        return self.text[:10]
+        return self.text

@@ -3,7 +3,6 @@ from rest_framework.serializers import (CharField, EmailField, IntegerField,
                                         ModelSerializer, Serializer,
                                         SlugRelatedField, ValidationError)
 from rest_framework.validators import UniqueValidator
-
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
 

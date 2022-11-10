@@ -43,7 +43,8 @@ class CreateUserSerializer(ModelSerializer):
                   'first_name',
                   'last_name',
                   'role',
-                  'bio')
+                  'bio'
+                  )
         read_only_fields = ('role',)
 
 
@@ -66,7 +67,7 @@ class SignUpSerializer(ModelSerializer):
         fields = ("username", "email")
 
 
-class JWTTokenSerializer(Serializer):
+class ConfirmationCodeSerializer(Serializer):
     """Сериалайзер JWT токена."""
     username = CharField(required=True)
     confirmation_code = CharField(required=True)
@@ -130,13 +131,14 @@ class ReviewSerializer(ModelSerializer):
 
     def validate(self, data):
         request = self.context['request']
-        author = request.user
+        if request.method != 'POST':
+            return data
         title_id = self.context.get('view').kwargs.get('title_id')
-        title = get_object_or_404(Title, id=title_id)
-        if (
-            request.method == 'POST'
-            and Review.objects.filter(title=title, author=author).exists()
-        ):
+        if (request.method == 'POST' and
+            Review.objects.filter(
+                title_id=title_id,
+                author=request.user
+            ).exists()):
             raise ValidationError('Может существовать только один отзыв!')
         return data
 

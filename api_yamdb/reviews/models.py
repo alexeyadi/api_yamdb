@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import (MaxValueValidator, MinValueValidator,
+                                    RegexValidator)
 from django.db import models
 
 from .validators import validation_year
@@ -63,7 +64,14 @@ class User(AbstractUser):
 class Genre(models.Model):
     """Жанры произведений."""
     name = models.CharField(max_length=256, verbose_name='Имя жанра')
-    slug = models.SlugField(unique=True, verbose_name='Слаг жанра')
+    slug = models.SlugField(
+        unique=True,
+        verbose_name='Слаг жанра',
+        validators=[RegexValidator(
+            r'^[-a-zA-Z0-9_]+$', message='Не допустимые символы'
+        )
+        ],
+    )
 
     class Meta:
         verbose_name = 'Жанр'
@@ -76,7 +84,14 @@ class Genre(models.Model):
 class Category(models.Model):
     """Категории произведений."""
     name = models.CharField(max_length=256, verbose_name='Имя категории')
-    slug = models.SlugField(unique=True, verbose_name='Слаг категории')
+    slug = models.SlugField(
+        unique=True,
+        verbose_name='Слаг категории',
+        validators=[RegexValidator(
+            r'^[-a-zA-Z0-9_]+$', message='Не допустимые символы'
+        )
+        ],
+    )
 
     class Meta:
         verbose_name = 'Категория'

@@ -101,7 +101,8 @@ class TitleReadSerializer(ModelSerializer):
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = ('id', 'name', 'year', 'description',
+                  'category', 'genre', 'rating')
 
 
 class TitleWriteSerializer(ModelSerializer):
@@ -115,7 +116,8 @@ class TitleWriteSerializer(ModelSerializer):
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = ('id', 'name', 'year', 'description',
+                  'category', 'genre')
 
 
 class ReviewSerializer(ModelSerializer):

@@ -1,9 +1,5 @@
 from rest_framework.permissions import SAFE_METHODS, BasePermission
-
-ROLES_FOR_MODIFY = (
-    'moderator',
-    'admin',
-)
+from reviews.models import ADMIN, MODER
 
 
 class IsAdminOrReadOnly(BasePermission):
@@ -11,10 +7,10 @@ class IsAdminOrReadOnly(BasePermission):
     '''Eсли пользователь не является админом.'''
     def has_permission(self, request, view):
         return (
-                request.method in SAFE_METHODS
-                or request.user.is_authenticated and (
-                        request.user.is_admin or request.user.is_superuser
-                ))
+            request.method in SAFE_METHODS
+            or request.user.is_authenticated and (
+                request.user.is_admin or request.user.is_superuser
+            ))
 
 
 class IsAdminModeratorAuthorPermission(BasePermission):
@@ -22,16 +18,17 @@ class IsAdminModeratorAuthorPermission(BasePermission):
     '''Eсли пользователь не является автором, модератором, админом.'''
     def has_permission(self, request, view):
         return (
-                request.method in SAFE_METHODS
-                or request.user.is_authenticated
+            request.method in SAFE_METHODS
+            or request.user.is_authenticated
         )
 
     def has_object_permission(self, request, view, obj):
         return (
-                request.method in SAFE_METHODS
-                or obj.author == request.user
-                or request.user.role in ROLES_FOR_MODIFY
-                )
+            request.method in SAFE_METHODS
+            or obj.author == request.user
+            or request.user.role == ADMIN
+            or request.user.role == MODER
+        )
 
 
 class IsAdmin(BasePermission):

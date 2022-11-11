@@ -43,6 +43,9 @@ class UserViewSet(ModelViewSet):
             serializer = UserSerializer(request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         if request.method == 'PATCH':
+            request.data._mutable = True
+            request.data['role'] = request.user.role
+            request.data._mutable = False
             serializer = CreateUserSerializer(
                 request.user,
                 data=request.data,

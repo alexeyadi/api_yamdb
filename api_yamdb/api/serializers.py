@@ -43,7 +43,8 @@ class CreateUserSerializer(ModelSerializer):
                   'first_name',
                   'last_name',
                   'role',
-                  'bio')
+                  'bio'
+                  )
         read_only_fields = ('role',)
 
 
@@ -100,7 +101,8 @@ class TitleReadSerializer(ModelSerializer):
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = ('id', 'name', 'year', 'description',
+                  'category', 'genre', 'rating')
 
 
 class TitleWriteSerializer(ModelSerializer):
@@ -114,7 +116,8 @@ class TitleWriteSerializer(ModelSerializer):
 
     class Meta:
         model = Title
-        fields = '__all__'
+        fields = ('id', 'name', 'year', 'description',
+                  'category', 'genre')
 
 
 class ReviewSerializer(ModelSerializer):
@@ -128,19 +131,20 @@ class ReviewSerializer(ModelSerializer):
 
     def validate(self, data):
         request = self.context['request']
-        author = request.user
+        if request.method != 'POST':
+            return data
         title_id = self.context.get('view').kwargs.get('title_id')
-        title = get_object_or_404(Title, id=title_id)
-        if (
-            request.method == 'POST'
-            and Review.objects.filter(title=title, author=author).exists()
-        ):
+        if (request.method == 'POST' and
+            Review.objects.filter(
+                title_id=title_id,
+                author=request.user
+            ).exists()):
             raise ValidationError('Может существовать только один отзыв!')
         return data
 
     class Meta:
         model = Review
-        fields = '__all__'
+        fields = ('id', 'author', 'title', 'text', 'score', 'pub_date')
 
 
 class CommentSerializer(ModelSerializer):
@@ -154,4 +158,4 @@ class CommentSerializer(ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ('id', 'author', 'review', 'text', 'pub_date')

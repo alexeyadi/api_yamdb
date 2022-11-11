@@ -440,7 +440,7 @@ PATCH api/v1/titles/{titles_id}/
 DEL http://127.0.0.1:8000/api/v1/titles/{titles_id}/
 ```
 
-###### Запросы к API по GENRES, REVIEWS и COMMENTS делаются аналогично, более подробно можно посмотреть по адресу http://127.0.0.1:8000/redoc/
+##### Запросы к API по GENRES, REVIEWS и COMMENTS делаются аналогично, более подробно можно посмотреть по адресу http://127.0.0.1:8000/redoc/
 
 ### Авторы проекта:
 - :man_technologist: [Алексей Адищев - alexeyadi (первый разработчик. Тимлид)](https://github.com/alexeyadi)

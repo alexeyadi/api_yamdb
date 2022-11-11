@@ -5,6 +5,8 @@ from django.db import models
 
 from .validators import validation_year
 
+FIRST_SYMBOLS = 10
+
 USER = 'user'
 MODER = 'moderator'
 ADMIN = 'admin'
@@ -97,6 +99,9 @@ class Category(models.Model):
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
+    def __str__(self):
+        return self.name
+
 
 class Title(models.Model):
     """Произведения, к которым пишут отзывы."""
@@ -123,7 +128,7 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
-        return self.name
+        return self.name[:FIRST_SYMBOLS]
 
 
 class Review(models.Model):
@@ -141,7 +146,7 @@ class Review(models.Model):
         verbose_name='Произведение'
     )
     text = models.TextField(blank=False, verbose_name='Текст отзыва')
-    score = models.IntegerField(
+    score = models.PositiveIntegerField(
         blank=False,
         validators=[
             MinValueValidator(
@@ -171,7 +176,7 @@ class Review(models.Model):
         ]
 
     def __str__(self):
-        return self.text[:10]
+        return self.text[:FIRST_SYMBOLS]
 
 
 class Comment(models.Model):
@@ -201,4 +206,4 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def __str__(self):
-        return self.text
+        return self.text[:FIRST_SYMBOLS]

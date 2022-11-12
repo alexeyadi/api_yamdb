@@ -5,6 +5,7 @@ from django.db import models
 
 from .validators import validation_year
 
+FIRST_SYMBOLS = 10
 
 USER = 'user'
 MODER = 'moderator'
@@ -127,7 +128,7 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
-        return self.name
+        return self.name[:FIRST_SYMBOLS]
 
 
 class Review(models.Model):
@@ -175,7 +176,7 @@ class Review(models.Model):
         ]
 
     def __str__(self):
-        return self.text
+        return self.text[:FIRST_SYMBOLS]
 
 
 class Comment(models.Model):
@@ -205,4 +206,4 @@ class Comment(models.Model):
         verbose_name_plural = 'Комментарии'
 
     def __str__(self):
-        return self.text
+        return self.text[:FIRST_SYMBOLS]

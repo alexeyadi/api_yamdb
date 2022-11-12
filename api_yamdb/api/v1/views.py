@@ -63,9 +63,9 @@ def sign_up(request):
     serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
-    user = get_object_or_404(
-        User,
-        username=serializer.validated_data['username']
+    user, _ = User.objects.get_or_create(
+        username=serializer.validated_data.get('username'),
+        email=serializer.validated_data.get('email')
     )
     confirmation_code = default_token_generator.make_token(user)
     send_mail(

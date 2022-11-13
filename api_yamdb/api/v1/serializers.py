@@ -133,11 +133,10 @@ class ReviewSerializer(ModelSerializer):
         if request.method != 'POST':
             return data
         title_id = self.context.get('view').kwargs.get('title_id')
-        if (request.method == 'POST' and
-            Review.objects.filter(
+        if (request.method == 'POST'
+            and Review.objects.filter(
                 title_id=title_id,
-                author=request.user
-            ).exists()):
+                author=request.user).exists()):
             raise ValidationError('Может существовать только один отзыв!')
         return data
 

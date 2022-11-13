@@ -22,6 +22,11 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer,
                           SignUpSerializer, TitleReadSerializer,
                           TitleWriteSerializer, UserSerializer)
+                          ConfirmationCodeSerializer, CreateUserSerializer,
+                          GenreSerializer, ReviewSerializer, SignUpSerializer,
+                          TitleReadSerializer, TitleWriteSerializer,
+                          UserSerializer)
+
 
 
 class UserViewSet(ModelViewSet):
@@ -43,6 +48,9 @@ class UserViewSet(ModelViewSet):
             serializer = UserSerializer(request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         if request.method == 'PATCH':
+            request.data._mutable = True
+            request.data['role'] = request.user.role
+            request.data._mutable = False
             serializer = CreateUserSerializer(
                 request.user,
                 data=request.data,
@@ -60,9 +68,9 @@ def sign_up(request):
     serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
-    user = get_object_or_404(
-        User,
-        username=serializer.validated_data['username']
+    user, _ = User.objects.get_or_create(
+        username=serializer.validated_data.get('username'),
+        email=serializer.validated_data.get('email')
     )
     confirmation_code = default_token_generator.make_token(user)
     send_mail(

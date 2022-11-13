@@ -18,10 +18,10 @@ from .filters import TitleFilter
 from .permissions import (IsAdmin, IsAdminModeratorAuthorPermission,
                           IsAdminOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
-                          CreateUserSerializer, GenreSerializer,
-                          ConfirmationCodeSerializer, ReviewSerializer,
-                          SignUpSerializer, TitleReadSerializer,
-                          TitleWriteSerializer, UserSerializer)
+                          ConfirmationCodeSerializer, CreateUserSerializer,
+                          GenreSerializer, ReviewSerializer, SignUpSerializer,
+                          TitleReadSerializer, TitleWriteSerializer,
+                          UserSerializer)
 
 
 class UserViewSet(ModelViewSet):

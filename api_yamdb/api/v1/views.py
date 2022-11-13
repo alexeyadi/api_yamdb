@@ -18,8 +18,8 @@ from .filters import TitleFilter
 from .permissions import (IsAdmin, IsAdminModeratorAuthorPermission,
                           IsAdminOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
-                          CreateUserSerializer, GenreSerializer,
-                          ConfirmationCodeSerializer, ReviewSerializer,
+                          ConfirmationCodeSerializer, CreateUserSerializer,
+                          GenreSerializer, ReviewSerializer,
                           SignUpSerializer, TitleReadSerializer,
                           TitleWriteSerializer, UserSerializer)
 

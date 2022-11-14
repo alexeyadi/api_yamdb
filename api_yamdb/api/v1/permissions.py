@@ -1,5 +1,4 @@
 from rest_framework.permissions import SAFE_METHODS, BasePermission
-from reviews.models import ADMIN, MODER
 
 
 class IsAdminOrReadOnly(BasePermission):
@@ -26,8 +25,8 @@ class IsAdminModeratorAuthorPermission(BasePermission):
         return (
             request.method in SAFE_METHODS
             or obj.author == request.user
-            or request.user.role == ADMIN
-            or request.user.role == MODER
+            or request.user.is_admin
+            or request.user.is_moderator
         )
 
 

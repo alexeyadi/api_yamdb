@@ -3,9 +3,8 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, status, viewsets
+from rest_framework import status
 from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.filters import SearchFilter
 from rest_framework.pagination import (LimitOffsetPagination,
                                        PageNumberPagination)
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -15,6 +14,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title, User
 
 from .filters import TitleFilter
+from .mixins import ModelMixinViewSet
 from .permissions import (IsAdmin, IsAdminModeratorAuthorPermission,
                           IsAdminOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -43,12 +43,13 @@ class UserViewSet(ModelViewSet):
             serializer = UserSerializer(request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         if request.method == 'PATCH':
-            request.data._mutable = True
-            request.data['role'] = request.user.role
-            request.data._mutable = False
+            new_data = request.data
+            new_data._mutable = True
+            new_data['role'] = request.user.role
+            new_data._mutable = False
             serializer = CreateUserSerializer(
                 request.user,
-                data=request.data,
+                data=new_data,
                 partial=True
             )
             serializer.is_valid(raise_exception=True)
@@ -92,15 +93,6 @@ def get_jwt_token(request):
         token = AccessToken.for_user(user)
         return Response({'JWT token': str(token)}, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ModelMixinViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
-                        mixins.DestroyModelMixin, viewsets.GenericViewSet):
-    pagination_class = LimitOffsetPagination
-    permission_classes = (IsAdminOrReadOnly,)
-    filter_backends = (SearchFilter,)
-    search_fields = ('name', )
-    lookup_field = 'slug'
 
 
 class GenreViewSet(ModelMixinViewSet):
